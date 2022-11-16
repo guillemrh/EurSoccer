@@ -29,3 +29,27 @@ print(leagues.head())
 
 teams = pd.read_sql("""SELECT * FROM Team ORDER BY team_long_name ASC LIMIT 10;""", conn)
 print(teams.head())
+
+#List of matches of Spanish league ordered by date
+
+matches = pd.read_sql("""SELECT Match.id, Country.name AS Country, League.name AS League, season, stage, date, HT.team_long_name AS home_team, AT.team_long_name AS away_team, home_team_goal, away_team_goal
+                      FROM Match 
+                      JOIN Country ON Country.id = Match.Country_id
+                      JOIN League ON League.id = Match.league_id
+                      LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+                      LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+                      WHERE Country = 'Spain' 
+                      ORDER BY date
+                      LIMIT 10;""", conn)
+print(matches.head())
+
+#FCBarcelona games for 2008/2009 season
+bcn = pd.read_sql("""SELECT Match.id, Country.name AS Country, League.name AS League, season, stage, date, HT.team_long_name AS home_team, AT.team_long_name AS away_team, home_team_goal, away_team_goal
+                      FROM Match 
+                      JOIN Country ON Country.id = Match.Country_id
+                      JOIN League ON League.id = Match.league_id
+                      LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+                      LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+                      WHERE Country = 'Spain' AND (home_team='FC Barcelona' OR away_team='FC Barcelona')
+                      ORDER BY date;""", conn)
+print(bcn.head())
