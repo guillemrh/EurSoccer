@@ -92,12 +92,38 @@ df.plot(figsize=(12,5), title='Average goals per game over time')
 # %%
 #Average goals difference home vs out
 df = pd.DataFrame(index=np.sort(leagues_by_season['season'].unique()), columns=leagues_by_season['country'].unique())
-df.loc[:,'Germany'] = list(leagues_by_season.loc[leagues_by_season['country']=='Germany','avg_goals_dif'])
-df.loc[:,'Spain'] = list(leagues_by_season.loc[leagues_by_season['country']=='Spain','avg_goals_dif'])
-df.loc[:,'Italy'] = list(leagues_by_season.loc[leagues_by_season['country']=='Italy','avg_goals_dif'])
-df.loc[:,'France'] = list(leagues_by_season.loc[leagues_by_season['country']=='France','avg_goals_dif'])
-df.loc[:,'England'] = list(leagues_by_season.loc[leagues_by_season['country']=='England','avg_goals_dif'])
+df.loc[:,'Germany'] = list(leagues_by_season.loc[leagues_by_season['country']=='Germany','avg_goal_diff'])
+df.loc[:,'Spain'] = list(leagues_by_season.loc[leagues_by_season['country']=='Spain','avg_goal_diff'])
+df.loc[:,'Italy'] = list(leagues_by_season.loc[leagues_by_season['country']=='Italy','avg_goal_diff'])
+df.loc[:,'France'] = list(leagues_by_season.loc[leagues_by_season['country']=='France','avg_goal_diff'])
+df.loc[:,'England'] = list(leagues_by_season.loc[leagues_by_season['country']=='England','avg_goal_diff'])
 
 df.plot(figsize=(12,5), title='Average goals difference home vs out')
 
+# %%
+#Sub queries
+
+players_height = pd.read_sql("""SELECT CASE
+                                        WHEN ROUND(height)<165 then 165
+                                        WHEN ROUND(height)>195 then 195
+                                        ELSE ROUND(height)
+                                        END AS calc_height, 
+                                        COUNT(height) AS distribution, 
+                                        (avg(PA_Grouped.avg_overall_rating)) AS avg_overall_rating,
+                                        (avg(PA_Grouped.avg_potential)) AS avg_potential,
+                                        AVG(weight) AS avg_weight 
+                            FROM PLAYER
+                            LEFT JOIN (SELECT Player_Attributes.player_api_id, 
+                                        avg(Player_Attributes.overall_rating) AS avg_overall_rating,
+                                        avg(Player_Attributes.potential) AS avg_potential  
+                                        FROM Player_Attributes
+                                        GROUP BY Player_Attributes.player_api_id) 
+                                        AS PA_Grouped ON PLAYER.player_api_id = PA_Grouped.player_api_id
+                            GROUP BY calc_height
+                            ORDER BY calc_height
+                                ;""", conn)
+print(players_height.head())
+
+#visualization potential vs height
+players_height.plot(x=['distribution'],y=['avg_overall_potential'],figsize=(12,5),title='Potential vs Height')
 # %%
