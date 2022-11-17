@@ -53,3 +53,26 @@ bcn = pd.read_sql("""SELECT Match.id, Country.name AS Country, League.name AS Le
                       WHERE Country = 'Spain' AND (home_team='FC Barcelona' OR away_team='FC Barcelona')
                       ORDER BY date;""", conn)
 print(bcn.head())
+
+#Leagues by season
+
+leagues_by_season = pd.read_sql("""SELECT Country.name AS country, 
+                                League.name AS League, 
+                                season,
+                                COUNT(DISTINCT stage) AS number_of_stages,
+                                COUNT(DISTINCT HT.team_long_name) AS number_of_teams,
+                                avg(home_team_goal) AS avg_home_team_scores,
+                                avg(away_team_goal) AS avg_away_team_goals,
+                                avg(home_team_goal-away_team_goal) AS avg_goal_diff,
+                                avg(home_team_goal+away_team_goal) AS avg_goals,
+                                sum(home_team_goal+away_team_goal) AS total_goals
+                                FROM Match
+                                JOIN Country ON Country.id = Match.country_id
+                                JOIN League ON League.id = Match.league_id
+                                LEFT JOIN Team AS HT ON HT.team_api_id = Match.home_team_api_id
+                                LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+                                WHERE country in ('Spain', 'Germany', 'France', 'Italy', 'England')
+                                GROUP BY Country.name, League.name, season
+                                HAVING COUNT(DISTINCT stage) > 10
+                                ORDER BY Country.name, League.name, season DESC;""", conn)
+print(leagues_by_season.head())
