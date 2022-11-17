@@ -76,3 +76,15 @@ leagues_by_season = pd.read_sql("""SELECT Country.name AS country,
                                 HAVING COUNT(DISTINCT stage) > 10
                                 ORDER BY Country.name, League.name, season DESC;""", conn)
 print(leagues_by_season.head())
+
+#Data visualization 
+#Average goals per game over time
+
+df = pd.DataFrame(index=np.sort(leagues_by_season['season'].unique()), columns=leagues_by_season['country'].unique())
+df.loc[:,'Germany'] = list(leagues_by_season.loc[leagues_by_season['country']=='Germany','avg_goals'])
+df.loc[:,'Spain'] = list(leagues_by_season.loc[leagues_by_season['country']=='Spain','avg_goals'])
+df.loc[:,'Italy'] = list(leagues_by_season.loc[leagues_by_season['country']=='Italy','avg_goals'])
+df.loc[:,'France'] = list(leagues_by_season.loc[leagues_by_season['country']=='France','avg_goals'])
+df.loc[:,'England'] = list(leagues_by_season.loc[leagues_by_season['country']=='England','avg_goals'])
+
+df.plot(figsize=(12,5), title='Average goals per game over time')
