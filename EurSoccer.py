@@ -1,6 +1,6 @@
 #Practice from https://www.kaggle.com/code/dimarudov/data-analysis-using-sql/notebook
-#Imports.
-
+#Imports
+#%%
 import numpy as np
 import pandas as pd
 import sqlite3 
@@ -88,3 +88,16 @@ df.loc[:,'France'] = list(leagues_by_season.loc[leagues_by_season['country']=='F
 df.loc[:,'England'] = list(leagues_by_season.loc[leagues_by_season['country']=='England','avg_goals'])
 
 df.plot(figsize=(12,5), title='Average goals per game over time')
+
+# %%
+#Average goals difference home vs out
+df = pd.DataFrame(index=np.sort(leagues_by_season['season'].unique()), columns=leagues_by_season['country'].unique())
+df.loc[:,'Germany'] = list(leagues_by_season.loc[leagues_by_season['country']=='Germany','avg_goals_dif'])
+df.loc[:,'Spain'] = list(leagues_by_season.loc[leagues_by_season['country']=='Spain','avg_goals_dif'])
+df.loc[:,'Italy'] = list(leagues_by_season.loc[leagues_by_season['country']=='Italy','avg_goals_dif'])
+df.loc[:,'France'] = list(leagues_by_season.loc[leagues_by_season['country']=='France','avg_goals_dif'])
+df.loc[:,'England'] = list(leagues_by_season.loc[leagues_by_season['country']=='England','avg_goals_dif'])
+
+df.plot(figsize=(12,5), title='Average goals difference home vs out')
+
+# %%
